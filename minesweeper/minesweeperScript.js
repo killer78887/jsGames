@@ -27,6 +27,8 @@ let paused = false;
 let gridArray = new Array(gridTotal);
 let cellOpened = 0;
 let totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
+let flagLeft = totalMine;
+
 ctx.imageSmoothingEnabled = false;
 
 function generateBoard(){
@@ -103,6 +105,9 @@ function update(){
         else if(gridArray[i].value>0 && gridArray[i].value<9) {
             ctx.drawImage(asset[gridArray[i].value], x*gridSize,y*gridSize,gridSize,gridSize);
         }
+        if(gridArray[i].flagged){
+            ctx.drawImage(asset[9], x*gridSize,y*gridSize,gridSize,gridSize);
+        }
         ctx.strokeRect(x*gridSize,y*gridSize,gridSize,gridSize);
     }
 }
@@ -112,11 +117,16 @@ function click(event) {
     var touchX = Math.floor((event.clientX - canvas.getBoundingClientRect().left)/gridSize);
     var touchY = Math.floor((event.clientY - canvas.getBoundingClientRect().top)/gridSize);
     if(!paused){
+        if(event.button===0){
         if(cellOpened===0){
             openCellFirst(touchX,touchY);
         }
         else{
             openCell(touchX,touchY);
+        }
+        }
+        else if (event.button===2) {
+            flag(touchX,touchY);
         }
     }
     //console.log("open", touchX, touchY);
@@ -177,8 +187,22 @@ function openCell(x,y) {
     update();
     checkWin();
 }
+function flag(x,y){
+    let index = x+y*grid.y;
+    if(!gridArray[index].flagged && flagLeft>0){
+        gridArray[index].flagged = true;
+        flagLeft--;
+        update();
+    }
+    else if(gridArray[index].flagged){
+        gridArray[index].flagged = false;
+        flagLeft++;
+        update();
+    }
+}
 function restart(){
     totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
+    flagLeft = totalMine;
     cellOpened = 0;
     paused = false;
     generateBoard();
@@ -220,11 +244,6 @@ function defeat(){
     ctx.textAlign = "center";
     ctx.fillText('BOOM...',canvas.width/2,canvas.height/2);
 }
-function debug(){
-    console.log("asset");
-}
-
-
 function checkImagesLoaded(asset) {
   var loadedCount = 0;
   asset.forEach(function(image) {
