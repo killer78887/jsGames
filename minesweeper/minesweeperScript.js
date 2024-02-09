@@ -1,15 +1,12 @@
-document.addEventListener("DOMContentLoaded",function (){
-    main();
-});
-function main(){
-    
+//document.addEventListener("DOMContentLoaded",function (){});
+
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const emtTotalMine = document.getElementById("mineCount");
-const emtCellOpened = document.getElementById("cellOpened");
+const emtTimer = document.getElementById("timer");
 const winsfx = new Audio("asset/win.wav");
 const explodesfx = new Audio("asset/explode.wav");
-let asset = new Array(10).fill(new Image());
+let asset = Array.from({length : 10}, ()=> new Image());
 asset[0].src = "asset/flag.png"
 asset[1].src = "asset/Num1.png"
 asset[2].src = "asset/Num2.png"
@@ -29,7 +26,7 @@ const mine = 9;
 let paused = false;
 let gridArray = new Array(gridTotal);
 let cellOpened = 0;
-let totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
+let totalMine = 1//(gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
 ctx.imageSmoothingEnabled = false;
 
 function generateBoard(){
@@ -66,10 +63,27 @@ function generateBoard(){
     
 }
 
+let Timer = {
+    second : 0,
+    intervalId : null,
+    start: function(){
+        this.intervalId = setInterval(() => {
+            if (!paused) {
+                this.second++;
+                emtTimer.innerText = this.second;
+            }
+        }, 1000);
+    },
+    reset : function(){
+        clearInterval(this.intervalId);
+        this.second = 0;
+        emtTimer.innerText = this.second;
+        console.log("reseting");
+    }
+};
+
 function update(){
     emtTotalMine.innerText = `💣 : ${totalMine}`;
-    emtCellOpened.innerText = `Cell Opened : ${cellOpened}`;
-    
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.strokeStyle = "black";
     //console.table(gridArray);
@@ -84,10 +98,7 @@ function update(){
             ctx.drawImage(asset[9],x*gridSize,y*gridSize,gridSize,gridSize);
         }
         else if(gridArray[i].value>0 && gridArray[i].value<9) {
-            ctx.fillStyle="red";
-            ctx.font = `${gridSize/2}px Varela`;
-            ctx.textAlign = "center"
-            ctx.fillText(gridArray[i].value,x*gridSize+(gridSize/2),y*gridSize+(gridSize*2/3));
+            ctx.drawImage(asset[gridArray[i].value], x*gridSize,y*gridSize,gridSize,gridSize);
         }
         ctx.strokeRect(x*gridSize,y*gridSize,gridSize,gridSize);
     }
@@ -105,7 +116,7 @@ function click(event) {
             openCell(touchX,touchY);
         }
     }
-    console.log("open", touchX, touchY);
+    //console.log("open", touchX, touchY);
 }
 canvas.addEventListener("click", click, false);
 
@@ -113,11 +124,11 @@ canvas.addEventListener("click", click, false);
 function openCellFirst(x,y) {
     let index = x+y*grid.x;
     if(gridArray[index].value!==0){
-        console.log("regenerate")
         generateBoard();
         openCellFirst(x,y);
     }
     else{
+        Timer.start();
         openCell(x,y);
     }
 }
@@ -169,12 +180,22 @@ function restart(){
     paused = false;
     generateBoard();
     update();
+    Timer.reset();
 }
 function checkWin(){
     if(cellOpened === gridTotal-totalMine){
         winsfx.play();
         paused=true;
         console.log("win");
+        ctx.globalAlpha = 0.4;
+        for (var i = 0; i < gridTotal; i++) {
+            if(gridArray[i].value===9){
+                let x = i%grid.x;
+                let y = (i-x)/grid.x;
+                ctx.drawImage(asset[9],x*gridSize,y*gridSize,gridSize,gridSize);
+            }
+        }
+        ctx.globalAlpha = 1;
         ctx.fillStyle = "Yellow";
         ctx.font = "70px Open Sans"
         ctx.textAlign = "center";
@@ -196,6 +217,26 @@ function defeat(){
     ctx.textAlign = "center";
     ctx.fillText('BOOM...',canvas.width/2,canvas.height/2);
 }
-generateBoard();
-update();
+function debug(){
+    console.log("asset");
 }
+
+
+function checkImagesLoaded(asset) {
+  var loadedCount = 0;
+  asset.forEach(function(image) {
+    image.onload = function() {
+      loadedCount++;
+      if (loadedCount === asset.length) {
+        console.log('All images have loaded properly.');
+        generateBoard();
+        update();
+      }
+    };
+    image.onerror = function() {
+        location.reload();
+    };
+  });
+}
+
+checkImagesLoaded(asset);

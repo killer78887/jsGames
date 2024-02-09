@@ -6,16 +6,10 @@ p{
     margin-top: 0%;
     margin-bottom: 0%;
 }
-aside{
-    position: absolute;
-    margin-left:80%;
-    width: 20%;
-    height: 100%;
-    background: #9C9EB4;
-}
 .minesweeperContainer {
     position: absolute;
-    transform: translate(50%,0%);
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,8 +21,19 @@ aside{
     width : 500px;
     height : 50px;
     background: darkgray;
+    display: flex;
+    align-items: center;
 }
 canvas{
     position: relative;
     border: 3px solid black;
+}
+.button{
+    position: absolute;
+    right:0;
+}
+#timer{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }

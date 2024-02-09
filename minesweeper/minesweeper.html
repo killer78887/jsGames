@@ -8,13 +8,11 @@
 </head>
 
 <body>
-    <aside>
-        <p id="cellOpened"></p>
-    </aside>
     <div class="minesweeperContainer">
         <div class="topBar">
-            <p id="mineCount" nobreak>refresh pls</p>
-            <input type="button" value="restart" onclick="main(() => restart())">
+            <p id="mineCount">refresh pls</p>
+            <p id="timer">0</p>
+            <input class="button" type="button" value="restart" onclick="restart()">
         </div>
         <canvas id="myCanvas" width="500" height="500"></canvas>
     </div>
