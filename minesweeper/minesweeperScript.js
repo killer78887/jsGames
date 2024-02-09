@@ -135,7 +135,7 @@ function click(event) {
     }
     //console.log("open", touchX, touchY);
 }
-canvas.addEventListener("click", click);
+canvas.addEventListener("mouseup", click);
 flagImg.addEventListener("click", function(){
     inputFlag = !inputFlag;
     if(inputFlag){
