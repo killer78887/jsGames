@@ -6,6 +6,8 @@ const emtFlagCount = document.getElementById("flagCount");
 const emtTimer = document.getElementById("timer");
 const winsfx = new Audio("asset/win.wav");
 const explodesfx = new Audio("asset/explode.wav");
+const flagImg = document.getElementById("flagIcon");
+
 let asset = Array.from({length : 10}, ()=> new Image());
 asset[0].src = "asset/flag.png"
 asset[1].src = "asset/Num1.png"
@@ -134,6 +136,15 @@ function click(event) {
     //console.log("open", touchX, touchY);
 }
 canvas.addEventListener("click", click, false);
+flagImg.addEventListener("click", function(){
+    inputFlag = !inputFlag;
+    if(inputFlag){
+        flagImg.style.scale = 1.2;
+    }
+    else{
+        flagImg.style.scale = 1;
+    }
+});
 
 //to ensure 1st click is always empty
 function openCellFirst(x,y) {
@@ -141,6 +152,9 @@ function openCellFirst(x,y) {
     if(gridArray[index].value!==0){
         generateBoard();
         openCellFirst(x,y);
+        //in case flag are placed and board is regenerated 
+        flagLeft=totalMine;
+        emtFlagCount.innerText = `${flagLeft}`;
     }
     else{
         Timer.start();

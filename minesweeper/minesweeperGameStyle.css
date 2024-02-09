@@ -71,6 +71,7 @@ canvas{
     position: relative;
     width: auto;
     height: 100%;
+    scale:1;
     image-rendering: pixelated;
 }
 #flagCount{
