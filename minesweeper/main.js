@@ -7,12 +7,26 @@ const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 const emtTotalMine = document.getElementById("mineCount");
 const emtCellOpened = document.getElementById("cellOpened");
+const winsfx = new Audio("/minesweeper/asset/win.wav");
+const explodesfx = new Audio("/minesweeper/asset/explode.wav");
+let asset = new Array(10).fill(new Image());
+asset[0].src = "/minesweeper/asset/flag.png"
+asset[1].src = "/minesweeper/asset/Num1.png"
+asset[2].src = "/minesweeper/asset/Num2.png"
+asset[3].src = "/minesweeper/asset/Num3.png"
+asset[4].src = "/minesweeper/asset/Num4.png"
+asset[5].src = "/minesweeper/asset/Num5.png"
+asset[6].src = "/minesweeper/asset/Num6.png"
+asset[7].src = "/minesweeper/asset/Num7.png"
+asset[8].src = "/minesweeper/asset/Num8.png"
+asset[9].src = "/minesweeper/asset/Mine.png"
 
 const grid = {x : 10, y : 10};
 const gridTotal = grid.x * grid.y;
 const gridSize = Math.sqrt(canvas.height*canvas.width/gridTotal);
 const mine = 9;
 //value - 0 Empty, 1-8, 9 Mine
+let paused = false;
 let gridArray = new Array(gridTotal);
 let cellOpened = 0;
 let totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
@@ -53,7 +67,7 @@ function generateBoard(){
 }
 
 function update(){
-    emtTotalMine.innerText = `Total Mine : ${totalMine}`;
+    emtTotalMine.innerText = `💣 : ${totalMine}`;
     emtCellOpened.innerText = `Cell Opened : ${cellOpened}`;
     
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -67,8 +81,7 @@ function update(){
             ctx.fillRect(x*gridSize,y*gridSize,gridSize,gridSize);
         }
         else if(gridArray[i].value===9){
-            ctx.fillStyle = "black";
-            ctx.fillRect(x*gridSize,y*gridSize,gridSize,gridSize);
+            ctx.drawImage(asset[9],x*gridSize,y*gridSize,gridSize,gridSize);
         }
         else if(gridArray[i].value>0 && gridArray[i].value<9) {
             ctx.fillStyle="red";
@@ -84,11 +97,13 @@ function click(event) {
     event.preventDefault();
     var touchX = Math.floor((event.clientX - canvas.getBoundingClientRect().left)/gridSize);
     var touchY = Math.floor((event.clientY - canvas.getBoundingClientRect().top)/gridSize);
-    if(cellOpened===0){
-        openCellFirst(touchX,touchY);
-    }
-    else{
-        openCell(touchX,touchY);
+    if(!paused){
+        if(cellOpened===0){
+            openCellFirst(touchX,touchY);
+        }
+        else{
+            openCell(touchX,touchY);
+        }
     }
     console.log("open", touchX, touchY);
 }
@@ -112,8 +127,10 @@ function openCell(x,y) {
         //do nothing
     }
     else if(gridArray[index].value===9){
-        //loose logic
         gridArray[index].open = true;
+        update();
+        defeat();
+        return 0;
     }
     else if(gridArray[index].value===0){
         gridArray[index].open = true;
@@ -144,9 +161,41 @@ function openCell(x,y) {
         cellOpened++;
     }
     update();
+    checkWin();
 }
-
-
+function restart(){
+    totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
+    cellOpened = 0;
+    paused = false;
+    generateBoard();
+    update();
+}
+function checkWin(){
+    if(cellOpened === gridTotal-totalMine){
+        winsfx.play();
+        paused=true;
+        console.log("win");
+        ctx.fillStyle = "Yellow";
+        ctx.font = "70px Open Sans"
+        ctx.textAlign = "center";
+        ctx.fillText('You Won',canvas.width/2,canvas.height/2);
+    }
+}
+function defeat(){
+    explodesfx.play();
+    paused=true;
+    //open all Mine
+    for (var i = 0; i < gridTotal; i++) {
+        if(gridArray[i].value===9){
+            gridArray[i].open = true;
+        }
+    }
+    update();
+    ctx.fillStyle = "Orange";
+    ctx.font = "70px Open Sans"
+    ctx.textAlign = "center";
+    ctx.fillText('BOOM...',canvas.width/2,canvas.height/2);
+}
 generateBoard();
 update();
 }

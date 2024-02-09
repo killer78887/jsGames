@@ -9,10 +9,15 @@
 
 <body>
     <aside>
-        <p id="mineCount">hello</p>
         <p id="cellOpened"></p>
     </aside>
-    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <div class="minesweeperContainer">
+        <div class="topBar">
+            <p id="mineCount" nobreak>refresh pls</p>
+            <input type="button" value="restart" onclick="main(() => restart())">
+        </div>
+        <canvas id="myCanvas" width="500" height="500"></canvas>
+    </div>
     <script defer src="/minesweeper/main.js"></script>
 </body>
 </html>
