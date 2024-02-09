@@ -2,7 +2,7 @@
 
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
-const emtTotalMine = document.getElementById("mineCount");
+const emtFlagCount = document.getElementById("flagCount");
 const emtTimer = document.getElementById("timer");
 const winsfx = new Audio("asset/win.wav");
 const explodesfx = new Audio("asset/explode.wav");
@@ -28,6 +28,7 @@ let gridArray = new Array(gridTotal);
 let cellOpened = 0;
 let totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
 let flagLeft = totalMine;
+let inputFlag = false;
 
 ctx.imageSmoothingEnabled = false;
 
@@ -85,7 +86,7 @@ let Timer = {
 };
 
 function update(){
-    emtTotalMine.innerText = `${totalMine}`;
+    emtFlagCount.innerText = `${flagLeft}`;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.strokeStyle = "black";
     //console.table(gridArray);
@@ -106,7 +107,7 @@ function update(){
             ctx.drawImage(asset[gridArray[i].value], x*gridSize,y*gridSize,gridSize,gridSize);
         }
         if(gridArray[i].flagged){
-            ctx.drawImage(asset[9], x*gridSize,y*gridSize,gridSize,gridSize);
+            ctx.drawImage(asset[0], x*gridSize,y*gridSize,gridSize,gridSize);
         }
         ctx.strokeRect(x*gridSize,y*gridSize,gridSize,gridSize);
     }
@@ -116,16 +117,17 @@ function click(event) {
     event.preventDefault();
     var touchX = Math.floor((event.clientX - canvas.getBoundingClientRect().left)/gridSize);
     var touchY = Math.floor((event.clientY - canvas.getBoundingClientRect().top)/gridSize);
+    console.log(event.button);
     if(!paused){
-        if(event.button===0){
-        if(cellOpened===0){
-            openCellFirst(touchX,touchY);
+        if(event.button===0 && !inputFlag){
+            if(cellOpened===0){
+                openCellFirst(touchX,touchY);
+            }
+            else{
+                openCell(touchX,touchY);
+            }
         }
-        else{
-            openCell(touchX,touchY);
-        }
-        }
-        else if (event.button===2) {
+        else if (event.button===2 || inputFlag) {
             flag(touchX,touchY);
         }
     }
@@ -188,8 +190,8 @@ function openCell(x,y) {
     checkWin();
 }
 function flag(x,y){
-    let index = x+y*grid.y;
-    if(!gridArray[index].flagged && flagLeft>0){
+    let index = x+y*grid.x;
+    if(!gridArray[index].flagged && flagLeft>0 && !gridArray[index].open){
         gridArray[index].flagged = true;
         flagLeft--;
         update();
