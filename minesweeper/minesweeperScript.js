@@ -26,7 +26,7 @@ const mine = 9;
 let paused = false;
 let gridArray = new Array(gridTotal);
 let cellOpened = 0;
-let totalMine = 1//(gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
+let totalMine = (gridTotal/10)+Math.floor(Math.random()*(gridTotal/10));
 ctx.imageSmoothingEnabled = false;
 
 function generateBoard(){
@@ -83,7 +83,7 @@ let Timer = {
 };
 
 function update(){
-    emtTotalMine.innerText = `💣 : ${totalMine}`;
+    emtTotalMine.innerText = `${totalMine}`;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.strokeStyle = "black";
     //console.table(gridArray);
@@ -91,8 +91,11 @@ function update(){
         let x = i%grid.x;
         let y = (i-x)/grid.x;
         if(!gridArray[i].open){
-            ctx.fillStyle = "grey";
+            let margin = gridSize/10;
+            ctx.fillStyle = "#4b4659";
             ctx.fillRect(x*gridSize,y*gridSize,gridSize,gridSize);
+            ctx.fillStyle = "#6b778e";
+            ctx.fillRect(x*gridSize+margin,y*gridSize+margin,gridSize-2*margin,gridSize-2*margin);
         }
         else if(gridArray[i].value===9){
             ctx.drawImage(asset[9],x*gridSize,y*gridSize,gridSize,gridSize);
@@ -187,7 +190,7 @@ function checkWin(){
         winsfx.play();
         paused=true;
         console.log("win");
-        ctx.globalAlpha = 0.4;
+        ctx.globalAlpha = 0.5;
         for (var i = 0; i < gridTotal; i++) {
             if(gridArray[i].value===9){
                 let x = i%grid.x;
