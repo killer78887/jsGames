@@ -136,6 +136,10 @@ function click(event) {
     //console.log("open", touchX, touchY);
 }
 canvas.addEventListener("mouseup", click);
+
+canvas.addEventListener("contextmenu", function(event) {
+    event.preventDefault(); // Prevent default context menu
+});
 flagImg.addEventListener("click", function(){
     inputFlag = !inputFlag;
     if(inputFlag){
