@@ -7,10 +7,10 @@ var Module = (function(){
   const velCap = 0.6;
   const birdMass = 10;
   
-  const pipeWidth = 40;
+  const pipeWidth = 50;
   const pipeGap = 100;
   const pipeGapX = pipeWidth*3;
-  const camVel = 0.1;
+  const camVel = 0.05;
   
   let boosting = false;
   
@@ -41,7 +41,7 @@ var Module = (function(){
   var game = {
     reset: function(){
       if(canReset){
-        birdPos.x = canv.width/5;
+        birdPos.x = 100;
         birdPos.y = canv.height/2;
         birdVel = 0;
         camOffset = 0;
@@ -112,12 +112,24 @@ var Module = (function(){
       birdPos.y = birdVel*dt + birdPos.y;
       birdPos.y = Math.min(canv.height-birdSize.y,Math.max(0,birdPos.y))
       camOffset = camVel*dt + camOffset;
-      //console.clear();
-      //console.log(camOffset);
     },
     checkCollision : function(){
+      let pipeX = pipes[0].x-camOffset;
+      let pipeY = pipes[0].y;
+      let corner = [birdPos,
+      {x: birdPos.x+birdSize.x ,y: birdPos.y},
+      {x: birdPos.x+birdSize.x ,y: birdPos.y+birdSize.y},
+      {x: birdPos.x,y: birdPos.y+birdSize.y}];
+      
       if(birdPos.y+birdSize.y>=canv.height || birdPos.y<=0){
         screen = 3;
+      }
+      for (var i = 0; i < 4; i++) {
+        if(corner[i].x>=pipeX && corner[i].x<=pipeX+pipeWidth){
+          if(corner[i].y>=pipeY || corner[i].y<=pipeY-pipeGap){
+            screen = 3;
+          }
+        }
       }
     },
     nextMenu : function(nextScreen){
@@ -134,7 +146,6 @@ var Module = (function(){
     },
     pipeGen : function(){
       for (let i=pipes.length; i<canv.width/pipeWidth; i++){
-        console.log(pipes);
         lastPipesX += pipeWidth+pipeGapX+Math.floor(Math.random()*pipeWidth);
         pipes.push({x:lastPipesX , y:Math.floor(Math.random()*(canv.height-2*pipeGap))+pipeGap})
       }
